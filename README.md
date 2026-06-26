@@ -5,3 +5,6 @@
 `git clone https://github.com/leodelmas00/tienda-boots-api.git`
 2. Instalar dependencias:
 `pnpm install`
+3. Para ejecutarlo:
+`node src/index.js`
+(o el .js debido)
