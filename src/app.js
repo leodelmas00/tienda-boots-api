@@ -1,18 +1,16 @@
 import express from "express";
-import cors from "cors";
 import clienteRoutes from "./routes/cliente.routes.js";
 
 const app = express();
 
-app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-app.get("/health", (req, res) => {
-  res.status(200).json({ ok: true, message: "API running" });
-});
+// Rutas
 
 app.use("/api/clientes", clienteRoutes);
+
+
+// Manejo de errores
 
 app.use((req, res) => {
   res.status(404).json({
