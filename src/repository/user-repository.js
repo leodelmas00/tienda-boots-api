@@ -90,10 +90,7 @@ export class UserRepository {
         return result.insertId;
     }
 
-    static async login({
-        username,
-        password
-    }) {
+    static async login({ username, password }) {
         const [rows] = await pool.query(
 
             `
@@ -126,7 +123,117 @@ export class UserRepository {
             email:user.email,
             dni:user.dni,
             direccion:user.direccion,
-            telefono:user.telefono
+            telefono:user.telefono,
+            foto_perfil: user.foto_perfil
         };
+    }
+
+    static async getById(id) {
+        const [rows] = await pool.query(
+            `SELECT
+                id_cliente,
+                username,
+                nombre,
+                apellido,
+                email,
+                dni,
+                direccion,
+                telefono,
+                foto_perfil
+            FROM Cliente
+            WHERE id_cliente = ?`,
+            [id]
+        );
+
+        if (rows.length === 0) {
+            throw new Error("Usuario no encontrado");
+        }
+
+        const user = rows[0];
+
+        return {
+            id: user.id_cliente,
+            username: user.username,
+            nombre: user.nombre,
+            apellido: user.apellido,
+            email: user.email,
+            dni: user.dni,
+            direccion: user.direccion,
+            telefono: user.telefono,
+            foto_perfil: user.foto_perfil
+        };
+    }
+
+    static async update(id, {
+        username,
+        email,
+        password,
+        dni,
+        direccion,
+        telefono,
+        foto_perfil
+    }) {
+        const fields = [];
+        const values = [];
+        if (username) {
+            fields.push("username = ?");
+            values.push(username);
+        }
+        if (email) {
+            fields.push("email = ?");
+            values.push(email);
+        }
+        if (password) {
+            const hashPassword = await bcrypt.hash(password, 10);
+
+            fields.push("password = ?");
+            values.push(hashPassword);
+        }
+        if (dni !== undefined) {
+            fields.push("dni = ?");
+            values.push(dni || null);
+        }
+        if (direccion !== undefined) {
+            fields.push("direccion = ?");
+            values.push(direccion || null);
+        }
+        if (telefono !== undefined) {
+            fields.push("telefono = ?");
+            values.push(telefono || null);
+        }
+        if (foto_perfil) {
+            fields.push("foto_perfil = ?");
+            values.push(foto_perfil);
+        }
+        if (fields.length === 0) {
+            throw new Error("No hay datos para actualizar");
+        }
+        values.push(id);
+        await pool.query(
+            `
+            UPDATE Cliente
+            SET ${fields.join(", ")}
+            WHERE id_cliente = ?
+            `,
+            values
+        );
+        const [rows] = await pool.query(
+            `
+            SELECT 
+                id_cliente AS id,
+                username,
+                nombre,
+                apellido,
+                email,
+                dni,
+                direccion,
+                telefono,
+                foto_perfil
+            FROM Cliente
+            WHERE id_cliente = ?
+            `,
+            [id]
+        );
+        return rows[0];
     }
 }
