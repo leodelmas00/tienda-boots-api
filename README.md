@@ -23,6 +23,7 @@ DB_PORT=3306
 DB_USER=tu_usuario
 DB_PASSWORD=tu_password
 DB_NAME=tienda_boots_db
+SECRET_JWT_KEY=la secret key
 ```
 
 4. Importar la base de datos (ver opciones más abajo).
@@ -85,6 +86,7 @@ database/tienda_boots_db.sql
 ## Estructura del proyecto
 
 ```
+├── database       # Una base de datos sql para poder exportar e importar
 /src
 ├── config         # Conexión a la base de datos y variables de entorno
 ├── models         # Definición de entidades / modelos
