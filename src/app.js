@@ -2,22 +2,24 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import "dotenv/config";
+import mysql from "mysql2";
 
 import clienteRoutes from "./routes/cliente.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import productoRoutes from "./routes/producto.routes.js";
+import pedidoRoutes from "./routes/pedido.routes.js";
 
 import { authMiddleware } from "./middleware/auth.middleware.js";
 
-const app = express();
+const app = express(
+);
 
 // Middlewares
 
 app.use(express.json());
-
 app.use(cookieParser());
-
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: process.env.FRONTEND_URL || "http://localhost:5173",
     credentials: true,
 }));
 
@@ -28,8 +30,9 @@ app.use("/uploads", express.static("uploads"));
 // Rutas
 
 app.use("/api/clientes", clienteRoutes);
-
-app.use("/", authRoutes);
+app.use("/api/productos", productoRoutes);
+app.use("/api/pedidos", pedidoRoutes);
+app.use("/api", authRoutes);
 
 // Manejo de errores
 

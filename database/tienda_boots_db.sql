@@ -1,8 +1,12 @@
 -- MySQL dump 10.13  Distrib 8.0.46, for Linux (x86_64)
---
+-- clientev2detallev2
 -- Host: 127.0.0.1    Database: tienda_boots_db
 -- ------------------------------------------------------
 -- Server version	8.0.46-0ubuntu0.24.04.3
+
+CREATE DATABASE IF NOT EXISTS tienda_boots_db
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;

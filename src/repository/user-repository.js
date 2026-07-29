@@ -124,7 +124,8 @@ export class UserRepository {
             dni:user.dni,
             direccion:user.direccion,
             telefono:user.telefono,
-            foto_perfil: user.foto_perfil
+            foto_perfil: user.foto_perfil,
+            rol: user.rol
         };
     }
 
@@ -139,7 +140,8 @@ export class UserRepository {
                 dni,
                 direccion,
                 telefono,
-                foto_perfil
+                foto_perfil,
+                rol
             FROM Cliente
             WHERE id_cliente = ?`,
             [id]
@@ -160,7 +162,8 @@ export class UserRepository {
             dni: user.dni,
             direccion: user.direccion,
             telefono: user.telefono,
-            foto_perfil: user.foto_perfil
+            foto_perfil: user.foto_perfil,
+            rol: user.rol
         };
     }
 
