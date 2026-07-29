@@ -1,6 +1,13 @@
 import "dotenv/config";
 import app from "./app.js";
-import mysql from "mysql2"
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
+});
 
 const PORT = process.env.PORT || 3001;
 

@@ -189,7 +189,7 @@ export class UserRepository {
         if (password) {
             const hashPassword = await bcrypt.hash(password, 10);
 
-            fields.push("password = ?");
+            fields.push("contrasenia = ?");
             values.push(hashPassword);
         }
         if (dni !== undefined) {

@@ -2,6 +2,13 @@ import pool from "../config/db.js";
 
 export class ProductoRepository {
 
+  // Convierte strings como "$200", "$1.200", "200.50" a número
+  static #parsePrecio(val) {
+    if (typeof val === "number") return val;
+    const cleaned = String(val).replace(/[$.\s]/g, "").replace(",", ".");
+    return Number(cleaned);
+  }
+
   // Mapea snake_case de MySQL → camelCase para el frontend
   static #toClient(row) {
     return {
@@ -49,12 +56,17 @@ export class ProductoRepository {
   }
 
   static async create({ nombre, descripcion, precio, color, marca, imagen, stock, stockClass, stars, talla, genero, material }) {
+    const precioNum = ProductoRepository.#parsePrecio(precio);
+    if (isNaN(precioNum) || precioNum < 0) throw new Error("Precio inválido");
+
+    const starsNum = stars !== undefined ? parseFloat(stars) : 0;
+
     const [result] = await pool.query(
       `INSERT INTO Producto
         (nombre, descripcion, precio, color, marca, imagen, stock, stock_class, stars, talla, genero, material)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [nombre, descripcion, precio, color, marca, imagen,
-       stock ?? "En stock", stockClass ?? "success", stars ?? 0,
+      [nombre, descripcion, precioNum, color, marca, imagen,
+       stock ?? "En stock", stockClass ?? "success", starsNum,
        talla, genero, material]
     );
     return result.insertId;
@@ -71,8 +83,18 @@ export class ProductoRepository {
 
     for (const [key, val] of Object.entries(mapped)) {
       if (allowed.includes(key) && val !== undefined) {
-        cols.push(`${key} = ?`);
-        vals.push(val);
+        if (key === "precio") {
+          const num = ProductoRepository.#parsePrecio(val);
+          if (isNaN(num) || num < 0) throw new Error("Precio inválido");
+          cols.push(`${key} = ?`);
+          vals.push(num);
+        } else if (key === "stars") {
+          cols.push(`${key} = ?`);
+          vals.push(parseFloat(val) || 0);
+        } else {
+          cols.push(`${key} = ?`);
+          vals.push(val);
+        }
       }
     }
     if (!cols.length) throw new Error("No hay campos para actualizar");
@@ -82,6 +104,14 @@ export class ProductoRepository {
   }
 
   static async delete(id) {
+    const [refs] = await pool.query(
+      "SELECT COUNT(*) AS cnt FROM Detalle WHERE id_producto = ?",
+      [id]
+    );
+    if (refs[0].cnt > 0) {
+      throw new Error("No se puede eliminar: el producto tiene pedidos asociados");
+    }
+
     const [result] = await pool.query("DELETE FROM Producto WHERE id_producto = ?", [id]);
     if (!result.affectedRows) throw new Error("Producto no encontrado");
     return true;
